@@ -6,7 +6,6 @@ const Main =()=>{
     return(
         <div className="w-[100vw] h-[100vh] bg-light flex rounded-[20px] overflow-hidden ">
             <Sidebar/>
-
             <Outlet/>         
         </div>
     )

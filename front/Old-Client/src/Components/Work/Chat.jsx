@@ -22,8 +22,6 @@ const Chat = () => {
         <div className="flex-[0.8] text-[13px] md:text-[1rem] bg-primaryDark rounded-2xl md:mr-0 mr-[6px]  overflow-y-auto">
             
          <YourMessage/>
-            
-            
          <OthersMessage/>
          <YourMessage/>
          <OthersMessage/>

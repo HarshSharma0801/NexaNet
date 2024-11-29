@@ -13,7 +13,7 @@ import AuthenticateUser from "./Components/Pages/AuthenticateUser";
 
 function App() {
   
-  axios.defaults.baseURL = 'http://localhost:5000/';
+  axios.defaults.baseURL = 'http://localhost:5050/';
  
 
   return (
@@ -32,9 +32,6 @@ function App() {
           <Route path="/home/OnlineUsers" element={<OnlineUsers />} />
           <Route path="/home/conversations" element={<MobileConversations />} />
           <Route path="/home/chat" element={<Work />} />
-
-
-
 
         </Route>
       </Routes>

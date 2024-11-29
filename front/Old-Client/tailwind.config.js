@@ -14,8 +14,6 @@ export default {
         'primarylighter': '#860A35',
         'primarylightDark' : '#860A35',
         'light' : '#BACDDB'
-
-      
       }
     },
   },
