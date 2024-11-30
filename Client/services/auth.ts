@@ -4,7 +4,7 @@ interface User {
   name: string;
   email: string;
   password: string;
-  UniqueUsername: string;
+  username: string;
 }
 
 interface LoginUser {
@@ -14,6 +14,8 @@ interface LoginUser {
   };
   load: () => void;
 }
+
+axios.defaults.baseURL = "http://localhost:7070";
 
 export const SignUpService = async (Userdata: User): Promise<boolean> => {
   try {

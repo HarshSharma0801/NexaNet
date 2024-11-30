@@ -21,7 +21,7 @@ const AuthenticateUser: FunctionComponent = (): ReactElement => {
           headers: headers,
         };
 
-        axios.get("/Token", config).then((res) => {
+        axios.get("http://localhost:7070/token", config).then((res) => {
           if (res) {
             SetUser(res.data.Userdata);
             setisData(true);

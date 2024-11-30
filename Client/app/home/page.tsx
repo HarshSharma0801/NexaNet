@@ -13,7 +13,7 @@ const Welcome: FunctionComponent = (): ReactElement => {
           <div>
             Yo👏{" "}
             <span className="text-primarylight">
-             Harsh-Admin
+             {UserData.UserInfo.username}
             </span>{" "}
             Get Started !!
           </div>

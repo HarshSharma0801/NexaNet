@@ -1,13 +1,19 @@
-'use client'
-import React, { ChangeEvent, FormEvent, FunctionComponent, ReactElement, useState } from "react";
+"use client";
+import React, {
+  ChangeEvent,
+  FormEvent,
+  FunctionComponent,
+  ReactElement,
+  useState,
+} from "react";
 import { SignUpService } from "@/services/auth";
 import { useRouter } from "next/navigation";
-const SignUp:FunctionComponent = ():ReactElement => {
+const SignUp: FunctionComponent = (): ReactElement => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    UniqueUsername: "",
+    username: "",
   });
   const [err, seterr] = useState(false);
   const router = useRouter();
@@ -70,7 +76,7 @@ const SignUp:FunctionComponent = ():ReactElement => {
               type="username"
               autoComplete="name"
               required
-              name="UniqueUsername"
+              name="username"
               onChange={handleChange}
               className="mt-1 p-2 w-full border rounded-md outline-none"
             />
