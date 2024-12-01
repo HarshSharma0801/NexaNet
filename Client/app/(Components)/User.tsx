@@ -9,7 +9,7 @@ const AuthenticateUser: FunctionComponent = (): ReactElement => {
   const router = useRouter();
 
   useEffect(() => {
-    const getUser = () => {
+    const getUser = async () => {
       const Rawdata = localStorage.getItem("UserData");
       if (Rawdata) {
         const data = JSON.parse(Rawdata);
@@ -21,7 +21,7 @@ const AuthenticateUser: FunctionComponent = (): ReactElement => {
           headers: headers,
         };
 
-        axios.get("http://localhost:7070/token", config).then((res) => {
+        await axios.get("http://localhost:7070/token", config).then((res) => {
           if (res) {
             SetUser(res.data.Userdata);
             setisData(true);

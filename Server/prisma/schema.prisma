@@ -14,10 +14,36 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  name     String
-  username String @unique
-  password String
-  avatar   String
+  id        Int         @id @default(autoincrement())
+  email     String      @unique
+  name      String
+  username  String      @unique
+  password  String
+  avatar    String
+  UserGroup UserGroup[]
+  Member    Member?
+
+  @@index([id, name])
 }
+
+model UserGroup {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id    Int
+  name       String
+  code       String
+  created_at DateTime @default(now())
+  Member     Member[]
+
+  @@index([id, name])
+}
+
+model Member {
+  id       Int       @id @default(autoincrement())
+  group    UserGroup @relation(fields: [group_id], references: [id], onDelete: Cascade)
+  group_id Int
+  user     User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id  Int       @unique
+}
+
+

@@ -1,9 +1,38 @@
-'use client'
-import { FunctionComponent, ReactElement } from "react";
+"use client";
+import {
+  FunctionComponent,
+  ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+} from "react";
 import YourMessage from "./YourMessage";
 import OthersMessage from "./OthersMessage";
+import { useParams } from "next/navigation";
+import { getSocket } from "@/providers/socket";
 
 const Chat: FunctionComponent = (): ReactElement => {
+  const { id } = useParams();
+
+  const socket = useMemo(() => {
+    const socketIO = getSocket();
+    return socketIO.connect();
+  }, [id]);
+
+  useEffect(() => {
+    socket.on("message", (data: any) => {
+      console.log("there is a message", data);
+    });
+    return () => {
+      socket.close();
+    };
+  }, [socket]);
+
+  const sendMessage = () => {
+    console.log("message in room ", id);
+    socket.emit("message", `message from room ${id}`);
+  };
+
   return (
     <>
       <div className="flex flex-[1] md:flex-[0.7] flex-col py-2 md:p-4 md:pl-0 gap-2 ">
@@ -33,6 +62,10 @@ const Chat: FunctionComponent = (): ReactElement => {
             className="md:flex-1  md:text-2xl text-white p-[10px] md:max-w-[100%] max-w-[80%] text-[20px] md:text-[1.3rem] md:p-2 outline-none bg-primaryDark"
           />
           <svg
+            onClick={() => {
+              console.log("cliked");
+              sendMessage();
+            }}
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"

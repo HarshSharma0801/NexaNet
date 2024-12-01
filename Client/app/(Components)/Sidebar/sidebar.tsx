@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { FunctionComponent, ReactElement } from "react";
 import ConversationsItem from "./ConversationItem";
 import { useRouter } from "next/navigation";
@@ -135,6 +135,7 @@ const Sidebar: FunctionComponent = (): ReactElement => {
         {DummyConversations.map((item) => {
           return (
             <ConversationsItem
+              id={item.id}
               key={item.id}
               name={item.name}
               msg={item.lastMessage}

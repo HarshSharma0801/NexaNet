@@ -1,20 +1,23 @@
-'use client'
+"use client";
 import { useRouter } from "next/navigation";
 import { FunctionComponent, ReactElement } from "react";
 
 interface ConversationProp {
+  id: number;
   name: string;
   msg: string;
   timestamp: string;
 }
 
-const ConversationsItem:FunctionComponent<ConversationProp> = (props: ConversationProp):ReactElement => {
+const ConversationsItem: FunctionComponent<ConversationProp> = (
+  props: ConversationProp
+): ReactElement => {
   const router = useRouter();
 
   return (
     <div
       onClick={() => {
-        router.push("/home/Chat");
+        router.push(`/home/Chat/${props.id}`);
       }}
       className="bg-primaryDark rounded-xl p-2 py-3 flex justify-between cursor-pointer  border-b-2 transition duration-150 ease-in-out  hover:bg-primarylighter  focus:bg-primarylighter focus:shadow-lg focus:outline-none focus:ring-0 active:bg-primarylighter active:shadow-lg "
     >
@@ -26,9 +29,7 @@ const ConversationsItem:FunctionComponent<ConversationProp> = (props: Conversati
         </div>
         <div className="flex flex-col gap-1">
           <div className="text-xl font-semibold text-white">{props.name}</div>
-          <div className="text-gray-300 hidden md:block">
-            {props.msg}
-          </div>
+          <div className="text-gray-300 hidden md:block">{props.msg}</div>
           <div className="text-gray-300  md:hidden">
             {props.msg.substring(0, 10)}..
           </div>
