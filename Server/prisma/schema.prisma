@@ -21,29 +21,37 @@ model User {
   password  String
   avatar    String
   UserGroup UserGroup[]
-  Member    Member?
-
-  @@index([id, name])
+  Message   Message[]
+  Member    Member[]
 }
 
 model UserGroup {
-  id         Int      @id @default(autoincrement())
-  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  user_id    Int
-  name       String
-  code       String
-  created_at DateTime @default(now())
+  id         String    @id @default(uuid()) @db.Uuid
+  name       String?
+  code       String?
+  isGroup    Boolean
+  created_at DateTime  @default(now())
+  admin      User?     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  adminId    Int
+  Message    Message[]
   Member     Member[]
-
-  @@index([id, name])
 }
 
 model Member {
-  id       Int       @id @default(autoincrement())
-  group    UserGroup @relation(fields: [group_id], references: [id], onDelete: Cascade)
-  group_id Int
-  user     User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  user_id  Int       @unique
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userGroupId String    @db.Uuid
+  userGroup   UserGroup @relation(fields: [userGroupId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
 }
 
-
+model Message {
+  id        Int       @id @default(autoincrement())
+  content   String
+  timestamp DateTime  @default(now())
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  groupId   String    @db.Uuid
+  group     UserGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+}

@@ -4,11 +4,16 @@ import { FunctionComponent, ReactElement, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 const Welcome: FunctionComponent = (): ReactElement => {
   const router = useRouter();
-
+  const [useer, setUser] = useState(null);
   const { user } = useAuthContext();
   useEffect(() => {
-    if (!user) {
+    const Rawdata = localStorage.getItem("UserData");
+
+    if (!Rawdata) {
       router.push("/");
+    } else {
+      const UserData = JSON.parse(Rawdata);
+      setUser(UserData.UserInfo);
     }
   }, []);
 
