@@ -16,6 +16,9 @@ const Chat: FunctionComponent = (): ReactElement => {
 
   const socket = useMemo(() => {
     const socketIO = getSocket();
+    socketIO.auth = {
+      conversation: id,
+    };
     return socketIO.connect();
   }, [id]);
 
@@ -29,7 +32,6 @@ const Chat: FunctionComponent = (): ReactElement => {
   }, [socket]);
 
   const sendMessage = () => {
-    console.log("message in room ", id);
     socket.emit("message", `message from room ${id}`);
   };
 

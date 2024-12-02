@@ -15,7 +15,7 @@ class AuthController {
       name,
       email,
       password,
-      avatar:"",
+      avatar: "",
       username,
     };
     try {
@@ -71,11 +71,7 @@ class AuthController {
     }
   };
 
-  authenticateToken = (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ) => {
+  token = async (req: express.Request, res: express.Response) => {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
     if (!token) {
@@ -84,13 +80,12 @@ class AuthController {
 
     jwt.verify(token, accessKey, (err, user) => {
       if (err) {
-        return res.sendStatus(403); // Forbidden
+        return res.status(403).json({ valid: false }); // Forbidden
       }
       req.user = user;
-      next();
+      res.status(200).json({ UserInfo: user, valid: true });
     });
   };
 }
-
 
 export default new AuthController();

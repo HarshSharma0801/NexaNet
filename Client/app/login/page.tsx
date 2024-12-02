@@ -26,7 +26,7 @@ const Login: FunctionComponent = (): ReactElement => {
       seterr(true);
       Setisloading(false);
     } else {
-      router.push("/home");
+      router.push("/");
     }
   };
 
