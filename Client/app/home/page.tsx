@@ -1,10 +1,16 @@
 "use client";
-import { FunctionComponent, ReactElement } from "react";
-
+import { useAuthContext } from "@/providers/auth-provider";
+import { FunctionComponent, ReactElement, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 const Welcome: FunctionComponent = (): ReactElement => {
-  const UserData =
-    localStorage.getItem("UserData") &&
-    JSON.parse(localStorage.getItem("UserData") ?? "");
+  const router = useRouter();
+
+  const { user } = useAuthContext();
+  useEffect(() => {
+    if (!user) {
+      router.push("/");
+    }
+  }, []);
 
   return (
     <div className="flex-[0.7] flex p-4 pl-0 ">
@@ -12,9 +18,7 @@ const Welcome: FunctionComponent = (): ReactElement => {
         <div className="flex items-center justify-center">
           <div>
             Yo👏{" "}
-            <span className="text-primarylight">
-             {UserData.UserInfo.username}
-            </span>{" "}
+            <span className="text-primarylight">{user && user.username}</span>{" "}
             Get Started !!
           </div>
         </div>
