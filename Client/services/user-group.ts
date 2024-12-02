@@ -1,3 +1,4 @@
+import { Group } from "@/types";
 import axios from "axios";
 
 axios.defaults.baseURL = "http://localhost:7070";
@@ -41,5 +42,41 @@ export const fetchUserGroupsService = async (userId: string): Promise<any> => {
   } catch (error) {
     console.error("Error fetching user group:", error);
     return false;
+  }
+};
+
+export const checkUserGroupsService = async (
+  userId: string,
+  groupId: string
+): Promise<{ conversation: Group | null; valid: boolean }> => {
+  try {
+    const { data } = await axios.post("/checkUserGroup", {
+      userId: userId,
+      groupId: groupId,
+    });
+
+    if (data.valid) {
+      return { valid: true, conversation: data.group };
+    }
+
+    return { valid: false, conversation: null };
+  } catch (error) {
+    console.error("Error fetching user group:", error);
+    return { valid: false, conversation: null };
+  }
+};
+
+export const getUserGroupByIdService = async (
+  groupId: string | string[]
+): Promise<{ conversation: Group | null; valid: boolean }> => {
+  try {
+    const { data } = await axios.get(`/userGroup/${groupId}`);
+    if (data.valid) {
+      return { valid: true, conversation: data.group };
+    }
+    return { valid: false, conversation: null };
+  } catch (error) {
+    console.error("Error fetching user group:", error);
+    return { valid: false, conversation: null };
   }
 };

@@ -17,6 +17,7 @@ class AuthController {
       password,
       avatar: "",
       username,
+      isGroup: false,
     };
     try {
       const UniqueUser = await this.prismaClient.user.findUnique({

@@ -19,6 +19,7 @@ model User {
   name      String
   username  String      @unique
   password  String
+  isGroup   Boolean
   avatar    String
   UserGroup UserGroup[]
   Message   Message[]
@@ -51,6 +52,7 @@ model Message {
   id        Int       @id @default(autoincrement())
   content   String
   timestamp DateTime  @default(now())
+  name      String
   userId    Int
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   groupId   String    @db.Uuid

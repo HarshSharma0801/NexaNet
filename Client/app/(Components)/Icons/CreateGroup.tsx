@@ -2,9 +2,10 @@
 import { FunctionComponent, ReactElement, useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createUserGroupService } from "@/services/user-group";
+import { useGroupsContext } from "@/providers/group-provider";
 const CreateGroup: FunctionComponent = (): ReactElement => {
   const [groupName, setGroupName] = useState<string>("");
-
+  const {getGroups} = useGroupsContext();
   const router = useRouter();
   const createGroup = useCallback(async () => {
     const Rawdata = localStorage.getItem("UserData");
@@ -16,6 +17,7 @@ const CreateGroup: FunctionComponent = (): ReactElement => {
         username:UserData.UserInfo.username
       });
       if (valid) {
+        getGroups()
         router.push("/home");
       }
     }

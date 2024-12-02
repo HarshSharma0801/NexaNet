@@ -2,17 +2,35 @@
 import {
   FunctionComponent,
   ReactElement,
-  useCallback,
   useEffect,
   useMemo,
+  useState,
 } from "react";
 import YourMessage from "./YourMessage";
 import OthersMessage from "./OthersMessage";
 import { useParams } from "next/navigation";
 import { getSocket } from "@/providers/socket";
+import { getUserGroupByIdService } from "@/services/user-group";
+import { Group } from "@/types";
 
 const Chat: FunctionComponent = (): ReactElement => {
   const { id } = useParams();
+
+  const [conversation, setConversation] = useState<Group | null>(null);
+
+  const getConversation = async () => {
+    if (id) {
+      const { conversation } = await getUserGroupByIdService(id);
+      console.log(conversation)
+      if (conversation) {
+        setConversation(conversation);
+      }
+    }
+  };
+
+  useEffect(() => {
+    getConversation();
+  }, []);
 
   const socket = useMemo(() => {
     const socketIO = getSocket();
@@ -38,25 +56,42 @@ const Chat: FunctionComponent = (): ReactElement => {
   return (
     <>
       <div className="flex flex-[1] md:flex-[0.7] flex-col py-2 md:p-4 md:pl-0 gap-2 ">
-        {/* //header */}
         <div className="flex flex-[0.1] gap-2 md:mr-0 mr-[6px]  bg-primaryDark rounded-2xl p-1 md:p-3 text-[13px] md:text-[1rem]">
           <div className="w-10 h-10 bg-slate-400 rounded-full flex justify-center text-center text-xl">
             <div className="m-auto">M</div>
           </div>
           <div className="flex flex-col gap-1">
-            <div className="text-xl font-semibold text-white">Name</div>
+            <div className="text-xl font-semibold text-white">
+              {conversation && conversation?.name}
+            </div>
             <div className="text-gray-400">online</div>
           </div>
         </div>
-        {/* chat */}
         <div className="flex-[0.8] text-[13px] md:text-[1rem] bg-primaryDark rounded-2xl md:mr-0 mr-[6px]  overflow-y-auto">
-          <YourMessage />
-          <OthersMessage />
-          <YourMessage />
-          <OthersMessage />
+          {conversation?.Message &&
+            conversation?.Message?.length > 0 &&
+            conversation?.Message?.map((message) => {
+              if (conversation.adminId === message.userId) {
+                return (
+                  <YourMessage
+                    content={message.content}
+                    key={message.id}
+                    timestamp={message.timestamp}
+                  />
+                );
+              } else {
+                return (
+                  <OthersMessage
+                    content={message.content}
+                    key={message.id}
+                    timestamp={message.timestamp}
+                    name={message.name}
+                  />
+                );
+              }
+            })}
         </div>
 
-        {/* input */}
         <div className="flex-[0.1] rounded-2xl md:max-w-[100%] max-w-[95%] bg-primaryDark md:p-1 md:pr-5 justify-start md:justify-between flex items-center ">
           <input
             type="text"
@@ -65,7 +100,6 @@ const Chat: FunctionComponent = (): ReactElement => {
           />
           <svg
             onClick={() => {
-              console.log("cliked");
               sendMessage();
             }}
             xmlns="http://www.w3.org/2000/svg"
