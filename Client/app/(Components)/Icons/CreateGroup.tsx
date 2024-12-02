@@ -13,6 +13,7 @@ const CreateGroup: FunctionComponent = (): ReactElement => {
       const valid = await createUserGroupService({
         name: groupName,
         userId: UserData.UserInfo.id,
+        username:UserData.UserInfo.username
       });
       if (valid) {
         router.push("/home");

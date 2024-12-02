@@ -9,5 +9,6 @@ router.post("/login", auth.login);
 router.get("/token", auth.token);
 
 router.post("/createUserGroup", userGroup.createUserGroup);
+router.get("/fetchUserGroups", userGroup.fetchGroups);
 
 export default router;

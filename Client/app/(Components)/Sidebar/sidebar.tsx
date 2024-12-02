@@ -1,7 +1,8 @@
 "use client";
-import { FunctionComponent, ReactElement } from "react";
+import { FunctionComponent, ReactElement, useEffect, useState } from "react";
 import ConversationsItem from "./ConversationItem";
 import { useRouter } from "next/navigation";
+import { fetchUserGroupsService } from "@/services/user-group";
 const Sidebar: FunctionComponent = (): ReactElement => {
   const router = useRouter();
   const DummyConversations = [
@@ -19,6 +20,22 @@ const Sidebar: FunctionComponent = (): ReactElement => {
     },
     { id: 3, name: "Tina", lastMessage: "Lets play here ", timestamp: "today" },
   ];
+
+  const [groups, setGroups] = useState([]);
+  const getGroups = async () => {
+    const Rawdata = localStorage.getItem("UserData");
+    if (Rawdata) {
+      const UserData = JSON.parse(Rawdata);
+      const groups = await fetchUserGroupsService(UserData.UserInfo.id);
+      if (groups.length > 0) {
+        setGroups(groups);
+      }
+    }
+  };
+
+  useEffect(() => {
+    getGroups();
+  }, []);
 
   return (
     <div className="flex-[0.3] p-1 md:p-4 flex flex-col border-gray-400 ">
