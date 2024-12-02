@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
-
+import { createAdapter } from "@socket.io/redis-streams-adapter";
+import redis from "../db/redis.config";
 class SocketService {
   private socketIO: Server;
 
@@ -10,6 +11,7 @@ class SocketService {
         allowedHeaders: ["*"],
         origin: "*",
       },
+      adapter: createAdapter(redis),
     });
   }
 
