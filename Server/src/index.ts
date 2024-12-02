@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import router from "./router/router";
 import http from "http";
 import SocketService from "./controllers/socket";
+import { PrismaClient } from "@prisma/client";
 dotenv.config();
 const app = express();
 
@@ -18,6 +19,7 @@ app.get("/", (req: express.Request, res: express.Response) => {
 });
 app.use(router);
 
+export const prismaDbClient = new PrismaClient();
 const server = http.createServer(app);
 SocketService.io.attach(server);
 server.listen(PORT, () => {

@@ -1,7 +1,9 @@
 "use client";
-import { FunctionComponent, ReactElement } from "react";
+import { FunctionComponent, ReactElement, useEffect, useState } from "react";
 import ConversationsItem from "./ConversationItem";
 import { useRouter } from "next/navigation";
+import { useGroupsContext } from "@/providers/group-provider";
+import { timeConvert } from "@/util";
 const Sidebar: FunctionComponent = (): ReactElement => {
   const router = useRouter();
   const DummyConversations = [
@@ -19,6 +21,8 @@ const Sidebar: FunctionComponent = (): ReactElement => {
     },
     { id: 3, name: "Tina", lastMessage: "Lets play here ", timestamp: "today" },
   ];
+
+  const { groups } = useGroupsContext();
 
   return (
     <div className="flex-[0.3] p-1 md:p-4 flex flex-col border-gray-400 ">
@@ -132,17 +136,19 @@ const Sidebar: FunctionComponent = (): ReactElement => {
         />
       </div>
       <div className="md:flex hidden flex-col gap-1 bg-primaryDark rounded-2xl   p-1 mt-2 flex-1">
-        {DummyConversations.map((item) => {
-          return (
-            <ConversationsItem
-              id={item.id}
-              key={item.id}
-              name={item.name}
-              msg={item.lastMessage}
-              timestamp={item.timestamp}
-            />
-          );
-        })}
+        {groups &&
+          groups.length > 0 &&
+          groups.map((item) => {
+            return (
+              <ConversationsItem
+                id={item.id}
+                key={item.id}
+                name={item.name}
+                msg={item.Message[0]?.content ?? ""}
+                timestamp={item.Message[0]?.timestamp.toDateString() ?? ""}
+              />
+            );
+          })}
       </div>
     </div>
   );

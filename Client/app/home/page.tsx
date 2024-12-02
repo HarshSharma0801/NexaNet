@@ -1,14 +1,16 @@
 "use client";
-import { useAuthContext } from "@/providers/auth-provider";
 import { FunctionComponent, ReactElement, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 const Welcome: FunctionComponent = (): ReactElement => {
   const router = useRouter();
-
-  const { user } = useAuthContext();
+  const [user, setUser] = useState(null);
   useEffect(() => {
-    if (!user) {
+    const Rawdata = localStorage.getItem("UserData");
+    if (!Rawdata) {
       router.push("/");
+    } else {
+      const UserData = JSON.parse(Rawdata);
+      setUser(UserData.UserInfo.username);
     }
   }, []);
 
@@ -17,9 +19,8 @@ const Welcome: FunctionComponent = (): ReactElement => {
       <div className="bg-primaryDark flex-1 flex justify-center text-center text-xl md:text-2xl text-white rounded-2xl">
         <div className="flex items-center justify-center">
           <div>
-            Yo👏{" "}
-            <span className="text-primarylight">{user && user.username}</span>{" "}
-            Get Started !!
+            Yo👏 <span className="text-primarylight">{user && user}</span> Get
+            Started !!
           </div>
         </div>
       </div>
