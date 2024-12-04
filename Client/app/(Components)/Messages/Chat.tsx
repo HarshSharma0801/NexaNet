@@ -19,9 +19,14 @@ const Chat: FunctionComponent = (): ReactElement => {
   const [conversation, setConversation] = useState<Group | null>(null);
 
   const getConversation = async () => {
-    if (id) {
-      const { conversation } = await getUserGroupByIdService(id);
-      console.log(conversation)
+    const Rawdata = localStorage.getItem("UserData");
+
+    if (id && Rawdata) {
+      const UserData = JSON.parse(Rawdata);
+      const { conversation } = await getUserGroupByIdService(
+        id,
+        UserData.UserInfo.id
+      );
       if (conversation) {
         setConversation(conversation);
       }

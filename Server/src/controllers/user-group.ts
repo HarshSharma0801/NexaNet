@@ -95,32 +95,30 @@ class UserGroup {
   }
 
   public async checkMemberShip(req: express.Request, res: express.Response) {
-    const { userId, groupId } = req.body;
+    const { userId, groupId, isGroup } = req.body;
 
     try {
-      const group = await prismaDbClient.userGroup.findUnique({
-        where: { id: groupId },
-        include: {
-          Message: {
-            orderBy: { timestamp: "desc" },
-            take: 20,
-          },
-          Member: {
-            select: {
-              userId: true,
-              name: true,
+      if (isGroup) {
+        const group = await prismaDbClient.userGroup.findUnique({
+          where: { id: String(groupId) },
+          include: {
+            Message: {
+              orderBy: { timestamp: "desc" },
+              take: 20,
+            },
+            Member: {
+              select: {
+                userId: true,
+                name: true,
+              },
             },
           },
-        },
-      });
-
-      if (!group) {
-        return res
-          .status(404)
-          .json({ valid: false, message: "Group not found" });
-      }
-
-      if (group.isGroup) {
+        });
+        if (!group) {
+          return res
+            .status(404)
+            .json({ valid: false, message: "Group not found" });
+        }
         const isMember = group.Member.some(
           (member) => member.userId === Number(userId)
         );
@@ -133,14 +131,36 @@ class UserGroup {
         }
         return res.status(200).json({ valid: true, group });
       } else {
-        const otherMember = group.Member.find(
-          (member) => member.userId !== Number(userId)
-        );
+        if (groupId.length == 36) {
+          const group = await prismaDbClient.userGroup.findUnique({
+            where: { id: String(groupId) },
+            include: {
+              Message: {
+                orderBy: { timestamp: "desc" },
+                take: 20,
+              },
+              Member: {
+                select: {
+                  userId: true,
+                  name: true,
+                },
+              },
+            },
+          });
+          if (group) {
+            const otherMember =
+              group &&
+              group.Member.find((member) => member.userId !== Number(userId));
 
-        if (!otherMember) {
+            group.adminId = userId;
+            group.name = otherMember ? otherMember.name : "";
+            return res.status(200).json({ valid: true, group });
+          }
+        } else {
           const user = await prismaDbClient.user.findUnique({
             where: { id: Number(userId) },
           });
+
           const otherUser = await prismaDbClient.user.findUnique({
             where: { id: Number(groupId) },
           });
@@ -152,29 +172,40 @@ class UserGroup {
             });
           }
 
-          const newGroup = await prismaDbClient.userGroup.create({
-            data: {
+          const userGroup = await prismaDbClient.userGroup.findFirst({
+            where: {
               isGroup: false,
-              adminId: Number(userId),
               Member: {
-                create: [
-                  { userId: Number(userId), name: user.name },
-                  { userId: Number(groupId), name: otherUser.name },
-                ],
+                every: {
+                  OR: [{ userId: user.id }, { userId: otherUser.id }],
+                },
               },
             },
-            include: {
-              Member: true,
-              Message: true,
-            },
           });
-          newGroup.adminId = user.id;
-          newGroup.name = otherUser.name;
-          return res.status(200).json({ valid: true, group: newGroup });
+
+          if (!userGroup) {
+            const newGroup = await prismaDbClient.userGroup.create({
+              data: {
+                isGroup: false,
+                adminId: Number(userId),
+                Member: {
+                  create: [
+                    { userId: Number(userId), name: user.username },
+                    { userId: Number(groupId), name: otherUser.username },
+                  ],
+                },
+              },
+              include: {
+                Member: true,
+                Message: true,
+              },
+            });
+            newGroup.name = otherUser.name;
+            return res.status(200).json({ valid: true, group: newGroup });
+          }
+          userGroup.name = otherUser.name;
+          return res.status(200).json({ valid: true, group: userGroup });
         }
-        group.adminId = userId;
-        group.name = otherMember.name;
-        return res.status(200).json({ valid: true, group });
       }
     } catch (error) {
       console.error("Error checking membership:", error);
@@ -184,7 +215,7 @@ class UserGroup {
 
   public async getUserGroupById(req: express.Request, res: express.Response) {
     const { id } = req.params;
-
+    const { userId } = req.query;
     try {
       const userGroup = await prismaDbClient.userGroup.findUnique({
         where: { id: id },
@@ -199,7 +230,38 @@ class UserGroup {
       });
 
       if (!userGroup) {
-        return res.status(404).json({ message: "Group not found" });
+        return res
+          .status(200)
+          .json({ valid: false, message: "group not found" });
+      }
+      if (!userGroup.isGroup) {
+        const otherMember = userGroup.Member.find(
+          (member) => member.userId !== Number(userId)
+        );
+        userGroup.name = otherMember ? otherMember?.name : "";
+      }
+
+      return res.status(200).json({ valid: true, group: userGroup });
+    } catch (error) {
+      console.error("Error fetching group:", error);
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+
+  public async getUserGroupByName(req: express.Request, res: express.Response) {
+    const { name } = req.query;
+    if (Array.isArray(name) || typeof name !== "string") {
+      return res.status(404).json({ message: "Group not found" });
+    }
+    try {
+      const userGroup = await prismaDbClient.userGroup.findMany({
+        where: { name: name },
+      });
+
+      if (!userGroup) {
+        return res
+          .status(200)
+          .json({ valid: false, message: "group not found" });
       }
 
       return res.status(200).json({ valid: true, group: userGroup });
