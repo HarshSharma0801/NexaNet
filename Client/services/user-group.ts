@@ -47,12 +47,14 @@ export const fetchUserGroupsService = async (userId: string): Promise<any> => {
 
 export const checkUserGroupsService = async (
   userId: string,
-  groupId: string
+  groupId: string,
+  isGroup: boolean
 ): Promise<{ conversation: Group | null; valid: boolean }> => {
   try {
     const { data } = await axios.post("/checkUserGroup", {
       userId: userId,
       groupId: groupId,
+      isGroup: isGroup,
     });
 
     if (data.valid) {
@@ -67,12 +69,36 @@ export const checkUserGroupsService = async (
 };
 
 export const getUserGroupByIdService = async (
-  groupId: string | string[]
+  groupId: string | string[],
+  userId: string
 ): Promise<{ conversation: Group | null; valid: boolean }> => {
   try {
-    const { data } = await axios.get(`/userGroup/${groupId}`);
+    const { data } = await axios.get(`/userGroup/${groupId}`, {
+      params: {
+        userId: userId,
+      },
+    });
     if (data.valid) {
       return { valid: true, conversation: data.group };
+    }
+    return { valid: false, conversation: null };
+  } catch (error) {
+    console.error("Error fetching user group:", error);
+    return { valid: false, conversation: null };
+  }
+};
+
+export const getUserGroupByNameService = async (
+  name: string | string[]
+): Promise<{ conversation: Group | null; valid: boolean }> => {
+  try {
+    const { data } = await axios.get(`/userGroup`, {
+      params: {
+        name: name,
+      },
+    });
+    if (data.valid) {
+      return { valid: true, conversation: data.group[0] };
     }
     return { valid: false, conversation: null };
   } catch (error) {

@@ -1,9 +1,25 @@
 "use client";
-import { FunctionComponent, ReactElement, useEffect, useState } from "react";
+import {
+  FunctionComponent,
+  ReactElement,
+  ReactNode,
+  useEffect,
+  useState,
+} from "react";
 import ConversationsItem from "./ConversationItem";
+import ConversationSearchItem from "./ConversationSearchItem";
 import { useRouter } from "next/navigation";
 import { useGroupsContext } from "@/providers/group-provider";
-import { timeConvert } from "@/util";
+import { FaUser, FaUsers } from "react-icons/fa";
+import { getUserByNameService } from "@/services/user";
+import { getUserGroupByNameService } from "@/services/user-group";
+
+interface ISearch {
+  id: number;
+  name: string;
+  icon: ReactNode;
+}
+
 const Sidebar: FunctionComponent = (): ReactElement => {
   const router = useRouter();
   const DummyConversations = [
@@ -21,8 +37,52 @@ const Sidebar: FunctionComponent = (): ReactElement => {
     },
     { id: 3, name: "Tina", lastMessage: "Lets play here ", timestamp: "today" },
   ];
-
+  const icons = [
+    {
+      id: 1,
+      name: "user",
+      icon: <FaUser className="w-5 h-5 text-primarylighter cursor-pointer" />,
+    },
+    {
+      id: 2,
+      name: "group",
+      icon: <FaUsers className="w-5 h-5 text-primarylighter cursor-pointer" />,
+    },
+  ];
   const { groups } = useGroupsContext();
+  const [selectedSearchIcon, setSelectedSearchIcon] = useState<ISearch>(
+    icons[0]
+  );
+  const [selectedSearch, setSelectedSearch] = useState<string>("");
+  const [searchConversation, setSearchConversation] = useState<any>(null);
+
+  const handleChange = (name: string) => {
+    const search = icons.filter((item) => item.name !== name)[0];
+    setSelectedSearchIcon(search);
+  };
+
+  const removeSearch = () => {
+    setSelectedSearch("");
+    setSearchConversation(null);
+  };
+
+  const handleSearch = async () => {
+    try {
+      if (selectedSearchIcon.name == "user") {
+        const response = await getUserByNameService(selectedSearch);
+        if (response.valid) {
+          setSearchConversation(response.user);
+        }
+      } else {
+        const response = await getUserGroupByNameService(selectedSearch);
+        if (response.valid) {
+          setSearchConversation(response.conversation);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="flex-[0.3] p-1 md:p-4 flex flex-col border-gray-400 ">
@@ -114,33 +174,63 @@ const Sidebar: FunctionComponent = (): ReactElement => {
         </div>
       </div>
 
-      <div className="rounded-2xl bg-primaryDark text-white p-3 mt-2 hidden md:flex items-center ">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="w-8 h-8"
+      <div className="rounded-2xl w-full gap-1 justify-between bg-primaryDark text-white p-3 mt-2 hidden md:flex items-center ">
+        <div
+          className="cursor-pointer p-1 md:py-3"
+          onClick={() => {
+            handleChange(selectedSearchIcon.name);
+          }}
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-          />
-        </svg>{" "}
+          {selectedSearchIcon.icon}
+        </div>
         <input
+          onChange={(e) => {
+            setSelectedSearch(e.target.value);
+          }}
           type="text"
+          value={selectedSearch}
           placeholder="search"
-          className="text-xl p-2 outline-none bg-primaryDark"
+          className="text-xl  outline-none bg-primaryDark"
         />
+        <div
+          className="hover:bg-primarylight rounded-full p-2 cursor-pointer"
+          onClick={handleSearch}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-8 h-8  "
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+            />
+          </svg>{" "}
+        </div>
       </div>
+
+      {searchConversation && (
+        <div className="pt-2">
+          <ConversationSearchItem
+            removeSearch={removeSearch}
+            isGroup={searchConversation.isGroup}
+            name={searchConversation.name}
+            id={searchConversation.id}
+          />
+        </div>
+      )}
+
       <div className="md:flex hidden flex-col gap-1 bg-primaryDark rounded-2xl   p-1 mt-2 flex-1">
         {groups &&
           groups.length > 0 &&
           groups.map((item) => {
             return (
               <ConversationsItem
+                isGroup={item.isGroup}
                 id={item.id}
                 key={item.id}
                 name={item.name}

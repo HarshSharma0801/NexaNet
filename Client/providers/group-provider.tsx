@@ -12,7 +12,7 @@ interface GroupsContextType {
   setGroups: React.Dispatch<React.SetStateAction<Group[] | null>>;
   getGroups: () => Promise<void>;
   conversation: Group | null;
-  getConversation: (id: string) => Promise<void>;
+  getConversation: (id: any, isGroup: boolean) => Promise<void>;
 }
 
 const GroupsContext = createContext<GroupsContextType | undefined>(undefined);
@@ -42,13 +42,14 @@ export const GroupsProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
   const router = useRouter();
-  const getConversation = async (id: string) => {
+  const getConversation = async (id: any, isGroup: boolean) => {
     const Rawdata = localStorage.getItem("UserData");
     if (Rawdata) {
       const UserData = JSON.parse(Rawdata);
       const { valid, conversation } = await checkUserGroupsService(
         UserData.UserInfo.id,
-        id
+        id,
+        isGroup
       );
       if (valid) {
         setConversation(conversation);
