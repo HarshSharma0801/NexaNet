@@ -6,13 +6,14 @@ import {
   fetchUserGroupsService,
 } from "@/services/user-group";
 import { useRouter } from "next/navigation";
+import { useJoinModal } from "./modal-provider";
 
 interface GroupsContextType {
   groups: Group[] | null;
   setGroups: React.Dispatch<React.SetStateAction<Group[] | null>>;
   getGroups: () => Promise<void>;
   conversation: Group | null;
-  getConversation: (id: any, isGroup: boolean) => Promise<void>;
+  getConversation: (id: any, isGroup: boolean, name: string) => Promise<void>;
 }
 
 const GroupsContext = createContext<GroupsContextType | undefined>(undefined);
@@ -30,7 +31,7 @@ export const GroupsProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [groups, setGroups] = useState<Group[] | null>(null);
   const [conversation, setConversation] = useState<Group | null>(null);
-
+  const { setOpen, setName, setId, setUserId } = useJoinModal();
   const getGroups = async () => {
     const Rawdata = localStorage.getItem("UserData");
     if (Rawdata) {
@@ -42,7 +43,8 @@ export const GroupsProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
   const router = useRouter();
-  const getConversation = async (id: any, isGroup: boolean) => {
+
+  const getConversation = async (id: any, isGroup: boolean, name: string) => {
     const Rawdata = localStorage.getItem("UserData");
     if (Rawdata) {
       const UserData = JSON.parse(Rawdata);
@@ -54,6 +56,11 @@ export const GroupsProvider: React.FC<{ children: React.ReactNode }> = ({
       if (valid) {
         setConversation(conversation);
         router.push(`/home/Chat/${conversation?.id}`);
+      } else {
+        setId(id);
+        setName(name);
+        setOpen(true);
+        setUserId(UserData.UserInfo.id);
       }
     }
   };

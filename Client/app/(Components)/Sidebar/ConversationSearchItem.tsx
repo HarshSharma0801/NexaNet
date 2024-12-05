@@ -18,7 +18,7 @@ const ConversationSearchItem: FunctionComponent<ConversationProp> = (
     <div className="bg-primaryDark rounded-xl  flex justify-between cursor-pointer  border-b-2 transition duration-150 ease-in-out   focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg ">
       <div
         onClick={() => {
-          getConversation(props.id, props.isGroup);
+          getConversation(props.id, props.isGroup, props.name);
         }}
         className="flex hover:bg-primarylighter rounded-xl  px-3 py-3 focus:bg-primarylighter space-between  w-full"
       >

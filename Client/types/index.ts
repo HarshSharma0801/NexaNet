@@ -38,3 +38,13 @@ export interface Message {
   name: string;
   user?: User;
 }
+
+export type Member = {
+  id: number;
+  userId: number;
+  user: User;
+  userGroupId: string;
+  userGroup: Group;
+  createdAt: Date;
+  name: string;
+};

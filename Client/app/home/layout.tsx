@@ -1,4 +1,5 @@
 import Sidebar from "../(Components)/Sidebar/sidebar";
+import { JoinGroup } from "../(Components)/models/join-group";
 const ViewLayout = async ({ children }: { children: React.ReactNode }) => {
   return (
     <>
@@ -6,6 +7,7 @@ const ViewLayout = async ({ children }: { children: React.ReactNode }) => {
         <Sidebar />
         {children}
       </div>
+      <JoinGroup />
     </>
   );
 };

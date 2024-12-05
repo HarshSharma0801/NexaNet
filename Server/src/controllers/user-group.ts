@@ -124,7 +124,7 @@ class UserGroup {
         );
 
         if (!isMember) {
-          return res.status(403).json({
+          return res.status(200).json({
             valid: false,
             message: "User is not a member of the group",
           });
