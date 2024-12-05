@@ -70,7 +70,7 @@ export const checkUserGroupsService = async (
 
 export const getUserGroupByIdService = async (
   groupId: string | string[],
-  userId: string
+  userId: number
 ): Promise<{ conversation: Group | null; valid: boolean }> => {
   try {
     const { data } = await axios.get(`/userGroup/${groupId}`, {

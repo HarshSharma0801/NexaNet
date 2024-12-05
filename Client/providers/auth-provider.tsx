@@ -1,6 +1,13 @@
-'use client'
+"use client";
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 
 interface User {
   id: number;
@@ -18,8 +25,22 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null); 
+export const UserProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  const [user, setUser] = useState<User | null>(null);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    const Rawdata = localStorage.getItem("UserData");
+    if (!Rawdata) {
+      router.push("/");
+    } else {
+      const UserData = JSON.parse(Rawdata);
+      setUser(UserData.UserInfo);
+    }
+  }, []);
 
   return (
     <UserContext.Provider value={{ user, setUser }}>

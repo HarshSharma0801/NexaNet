@@ -235,7 +235,7 @@ const Sidebar: FunctionComponent = (): ReactElement => {
                 key={item.id}
                 name={item.name}
                 msg={item.Message[0]?.content ?? ""}
-                timestamp={item.Message[0]?.timestamp.toDateString() ?? ""}
+                timestamp={item.Message[0]?.timestamp || new Date()}
               />
             );
           })}

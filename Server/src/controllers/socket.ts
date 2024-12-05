@@ -1,5 +1,6 @@
 import { Server, Socket } from "socket.io";
 import { createAdapter } from "@socket.io/redis-streams-adapter";
+import messageService from "./message";
 import redis from "../db/redis.config";
 
 interface ConversationSocket extends Socket {
@@ -41,8 +42,13 @@ class SocketService {
       if (socket.conversation) {
         socket.join(socket.conversation);
         socket.on("message", async (message) => {
-          console.log("new message:", message);
-          io.to(socket.conversation ?? "").emit("message", message);
+          const savedMessage = await messageService.createMessage(message);
+          if (savedMessage.valid) {
+            io.to(socket.conversation ?? "").emit("message", {
+              valid: true,
+              message: savedMessage.data,
+            });
+          }
         });
       }
     });

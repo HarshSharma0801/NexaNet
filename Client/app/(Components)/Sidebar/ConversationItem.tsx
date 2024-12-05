@@ -1,23 +1,24 @@
 "use client";
 import { useGroupsContext } from "@/providers/group-provider";
 import { FunctionComponent, ReactElement } from "react";
-
+import { timeConvert } from "@/util";
 interface ConversationProp {
   id: any;
   name: string;
   msg: string;
-  timestamp: string;
-  isGroup:boolean
+  timestamp: Date;
+  isGroup: boolean;
 }
 
 const ConversationsItem: FunctionComponent<ConversationProp> = (
   props: ConversationProp
 ): ReactElement => {
   const { getConversation } = useGroupsContext();
+  console.log(props.timestamp)
   return (
     <div
-      onClick={() => { 
-        getConversation(props.id , props.isGroup);
+      onClick={() => {
+        getConversation(props.id, props.isGroup);
       }}
       className="bg-primaryDark rounded-xl p-2 py-3 flex justify-between cursor-pointer  border-b-2 transition duration-150 ease-in-out  hover:bg-primarylighter  focus:bg-primarylighter focus:shadow-lg focus:outline-none focus:ring-0 active:bg-primarylighter active:shadow-lg "
     >
@@ -29,15 +30,18 @@ const ConversationsItem: FunctionComponent<ConversationProp> = (
         </div>
         <div className="flex flex-col gap-1">
           <div className="text-xl font-semibold text-white">{props.name}</div>
-          <div className="text-gray-300 hidden md:block">{props.msg}</div>
+          <div className="text-gray-300 hidden md:block">
+            {" "}
+            {`${props.msg.substring(0, 10)}..`}
+          </div>
           <div className="text-gray-300  md:hidden">
-            {props.msg.substring(0, 10)}..
+            {`${props.msg.substring(0, 10)}..`}
           </div>
         </div>
       </div>
 
       <div className="flex justify-end text-white">
-        <div>{props.timestamp}</div>
+        <div>{timeConvert(props.timestamp)}</div>
       </div>
     </div>
   );

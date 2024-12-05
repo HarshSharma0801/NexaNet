@@ -1,29 +1,14 @@
-export const timeConvert = (timestamp: string): string => {
-  if(timestamp=""){
-    return "";
-  }  
-  const currentDate = new Date();
-  const date = new Date(timestamp);
+import { format, isAfter, addHours } from "date-fns";
 
-  const timeDiff = currentDate.getTime() - date.getTime();
+export const timeConvert = (timestamp: string | Date): string => {
+  const now = new Date();
+  const twentyFourHoursFromNow = addHours(now, 24);
 
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
+  const parsedTimestamp = timestamp instanceof Date ? timestamp : new Date(timestamp);
 
-  const timeFormatted = `${hours.toString().padStart(2, "0")}:${minutes
-    .toString()
-    .padStart(2, "0")}`;
-
-  if (timeDiff >= 24 * 60 * 60 * 1000) {
-    // More than 24 hours ago
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear().toString().slice(-2);
-
-    return `Yesterday, ${month.toString().padStart(2, "0")}/${day
-      .toString()
-      .padStart(2, "0")}/${year}`;
+  if (isAfter(parsedTimestamp, twentyFourHoursFromNow)) {
+    return format(parsedTimestamp, "d MMM yyyy");
+  } else {
+    return format(parsedTimestamp, "HH:mm");
   }
-
-  return timeFormatted;
 };
