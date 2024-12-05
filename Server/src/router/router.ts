@@ -3,6 +3,7 @@ import auth from "../controllers/auth";
 import userGroup from "../controllers/user-group";
 import user from "../controllers/user";
 import message from "../controllers/message";
+import member from "../controllers/member";
 const router = express.Router();
 
 router.post("/signup", auth.signup);
@@ -19,5 +20,7 @@ router.get("/user/:id", user.getUserById);
 router.get("/user", user.getUserByName);
 
 router.post("/createMessage", message.createMessage);
+
+router.post("/createMember", member.createMember);
 
 export default router;

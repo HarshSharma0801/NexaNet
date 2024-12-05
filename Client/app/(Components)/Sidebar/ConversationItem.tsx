@@ -14,11 +14,11 @@ const ConversationsItem: FunctionComponent<ConversationProp> = (
   props: ConversationProp
 ): ReactElement => {
   const { getConversation } = useGroupsContext();
-  console.log(props.timestamp)
+
   return (
     <div
       onClick={() => {
-        getConversation(props.id, props.isGroup);
+        getConversation(props.id, props.isGroup, props.name);
       }}
       className="bg-primaryDark rounded-xl p-2 py-3 flex justify-between cursor-pointer  border-b-2 transition duration-150 ease-in-out  hover:bg-primarylighter  focus:bg-primarylighter focus:shadow-lg focus:outline-none focus:ring-0 active:bg-primarylighter active:shadow-lg "
     >

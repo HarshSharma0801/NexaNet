@@ -92,7 +92,7 @@ const Chat: FunctionComponent = (): ReactElement => {
   return (
     <>
       <div className="flex flex-[1] md:flex-[0.7] flex-col py-2 md:p-4 md:pl-0 gap-2 ">
-        <div className="flex flex-[0.1] gap-2 md:mr-0 mr-[6px]  bg-primaryDark rounded-2xl p-1 md:p-3 text-[13px] md:text-[1rem]">
+        <div className="flex flex-[0.05] gap-2 md:mr-0 mr-[6px]  bg-primaryDark rounded-2xl p-3 md:p-3 text-[13px] md:text-[1rem]">
           <div className="w-10 h-10 bg-slate-400 rounded-full flex justify-center text-center text-xl">
             <div className="m-auto">M</div>
           </div>
@@ -105,7 +105,7 @@ const Chat: FunctionComponent = (): ReactElement => {
         </div>
         <div
           ref={scrollRef}
-          className="flex-[0.8] text-[13px] md:text-[1rem] bg-primaryDark rounded-2xl md:mr-0 mr-[6px]  overflow-y-auto"
+          className="flex-[0.9] text-[13px] md:text-[1rem] bg-primaryDark rounded-2xl md:mr-0 mr-[6px]  overflow-y-auto"
         >
           {conversation &&
             AllMessages?.length > 0 &&
@@ -131,7 +131,7 @@ const Chat: FunctionComponent = (): ReactElement => {
             })}
         </div>
 
-        <div className="flex-[0.1] rounded-2xl md:max-w-[100%] max-w-[95%] bg-primaryDark md:p-1 md:pr-5 justify-start md:justify-between flex items-center ">
+        <div className="flex-[0.1] rounded-2xl md:max-w-[100%] max-w-[98%] bg-primaryDark md:p-1 md:pr-5 justify-start md:justify-between flex items-center ">
           <input
             onChange={(e) => {
               setMessage(e.target.value);
