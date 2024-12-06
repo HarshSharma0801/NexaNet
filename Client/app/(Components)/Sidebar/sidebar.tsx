@@ -216,6 +216,7 @@ const Sidebar: FunctionComponent = (): ReactElement => {
       {searchConversation && (
         <div className="pt-2">
           <ConversationSearchItem
+            avatar={searchConversation.avatar}
             removeSearch={removeSearch}
             isGroup={searchConversation.isGroup}
             name={searchConversation.name}
@@ -230,6 +231,7 @@ const Sidebar: FunctionComponent = (): ReactElement => {
           groups.map((item) => {
             return (
               <ConversationsItem
+                avatar={item.avatar}
                 isGroup={item.isGroup}
                 id={item.id}
                 key={item.id}

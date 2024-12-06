@@ -46,6 +46,7 @@ class Message {
           userId: Number(userId),
           groupId,
           timestamp: new Date(),
+          avatar: userExists.avatar,
         },
       });
 

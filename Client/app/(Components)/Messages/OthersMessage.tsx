@@ -6,12 +6,14 @@ interface IOtherMessage {
   content: string;
   timestamp: Date;
   name: string;
+  avatar?: string;
 }
 
 const OthersMessage: FunctionComponent<IOtherMessage> = ({
   content,
   timestamp,
   name,
+  avatar,
 }): ReactElement => {
   return (
     <>
@@ -19,7 +21,11 @@ const OthersMessage: FunctionComponent<IOtherMessage> = ({
         <div className=" flex gap-[0.3rem]">
           <div className="flex-none flex flex-col justify-start ">
             <div className="rounded-full w-10 h-10  bg-slate-400 flex justify-center items-center text-center ">
-              M
+              {avatar ? (
+                <img src={avatar} className="w-full h-full object-cover rounded-full" />
+              ) : (
+                name[0]
+              )}
             </div>
           </div>
           <div className="py-1">

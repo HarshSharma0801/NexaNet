@@ -36,6 +36,7 @@ model UserGroup {
   adminId    Int
   Message    Message[]
   Member     Member[]
+  avatar     String?
 }
 
 model Member {
@@ -46,6 +47,7 @@ model Member {
   userGroup   UserGroup @relation(fields: [userGroupId], references: [id], onDelete: Cascade)
   createdAt   DateTime  @default(now())
   name        String
+  avatar      String?
 }
 
 model Message {
@@ -57,4 +59,5 @@ model Message {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   groupId   String    @db.Uuid
   group     UserGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  avatar    String?
 }

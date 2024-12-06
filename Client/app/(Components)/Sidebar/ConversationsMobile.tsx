@@ -21,6 +21,7 @@ const MobileConversations: FunctionComponent = () => {
         groups.map((item) => {
           return (
             <ConversationsItem
+              avatar={item.avatar}
               isGroup={item.isGroup}
               id={item.id}
               key={item.id}

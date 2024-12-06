@@ -94,7 +94,14 @@ const Chat: FunctionComponent = (): ReactElement => {
       <div className="flex flex-[1] md:flex-[0.7] flex-col py-2 md:p-4 md:pl-0 gap-2 ">
         <div className="flex flex-[0.05] gap-2 md:mr-0 mr-[6px]  bg-primaryDark rounded-2xl p-3 md:p-3 text-[13px] md:text-[1rem]">
           <div className="w-10 h-10 bg-slate-400 rounded-full flex justify-center text-center text-xl">
-            <div className="m-auto">M</div>
+            {conversation?.avatar ? (
+              <img
+                src={conversation.avatar}
+                className="w-full h-full object-cover rounded-full"
+              />
+            ) : (
+              <div className="m-auto">{conversation?.name[0]}</div>
+            )}
           </div>
           <div className="flex flex-col gap-1">
             <div className="text-xl font-semibold text-white">
@@ -121,6 +128,7 @@ const Chat: FunctionComponent = (): ReactElement => {
               } else {
                 return (
                   <OthersMessage
+                     avatar={message.avatar}
                     content={message.content}
                     key={message.id}
                     timestamp={message.timestamp}

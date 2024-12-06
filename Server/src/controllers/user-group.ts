@@ -1,6 +1,7 @@
 import express from "express";
 import { prismaDbClient } from "..";
 import { v4 as uuidv4 } from "uuid";
+import { makeAvatar } from "../util/avatar";
 
 class UserGroup {
   public async createUserGroup(req: express.Request, res: express.Response) {
@@ -19,23 +20,30 @@ class UserGroup {
           code: groupCode,
           isGroup: true,
           adminId: userId,
+          avatar: makeAvatar(),
         },
       });
-
-      const member = await prismaDbClient.member.create({
-        data: {
-          userId: userId,
-          userGroupId: newUserGroup.id,
-          name: username,
-        },
+      const UniqueUser = await prismaDbClient.user.findUnique({
+        where: { username: username },
       });
 
-      return res.status(200).json({
-        valid: true,
-        message: "User group created",
-        code: newUserGroup.code,
-        member: member.id,
-      });
+      if (UniqueUser) {
+        const member = await prismaDbClient.member.create({
+          data: {
+            userId: userId,
+            userGroupId: newUserGroup.id,
+            name: username,
+            avatar: UniqueUser?.avatar,
+          },
+        });
+
+        return res.status(200).json({
+          valid: true,
+          message: "User group created",
+          code: newUserGroup.code,
+          member: member.id,
+        });
+      }
     } catch (error) {
       console.error("Error creating user group:", error);
       res.status(500).json({ error: "Internal server error", valid: false });
@@ -68,6 +76,7 @@ class UserGroup {
             select: {
               userId: true,
               name: true,
+              avatar: true,
             },
           },
         },
@@ -82,6 +91,7 @@ class UserGroup {
 
           if (otherMember) {
             group.name = otherMember.name || "Unnamed";
+            group.avatar = otherMember.avatar;
           }
         }
         return group;
@@ -143,6 +153,7 @@ class UserGroup {
                 select: {
                   userId: true,
                   name: true,
+                  avatar: true,
                 },
               },
             },
@@ -154,6 +165,7 @@ class UserGroup {
 
             group.adminId = userId;
             group.name = otherMember ? otherMember.name : "";
+            group.avatar = otherMember ? otherMember.avatar : "";
             return res.status(200).json({ valid: true, group });
           }
         } else {
@@ -190,8 +202,16 @@ class UserGroup {
                 adminId: Number(userId),
                 Member: {
                   create: [
-                    { userId: Number(userId), name: user.username },
-                    { userId: Number(groupId), name: otherUser.username },
+                    {
+                      userId: Number(userId),
+                      name: user.username,
+                      avatar: user.avatar,
+                    },
+                    {
+                      userId: Number(groupId),
+                      name: otherUser.username,
+                      avatar: otherUser.avatar,
+                    },
                   ],
                 },
               },
@@ -201,9 +221,11 @@ class UserGroup {
               },
             });
             newGroup.name = otherUser.name;
+            newGroup.avatar = otherUser.avatar;
             return res.status(200).json({ valid: true, group: newGroup });
           }
           userGroup.name = otherUser.name;
+          userGroup.avatar = otherUser.avatar;
           return res.status(200).json({ valid: true, group: userGroup });
         }
       }
@@ -239,6 +261,7 @@ class UserGroup {
           (member) => member.userId !== Number(userId)
         );
         userGroup.name = otherMember ? otherMember?.name : "";
+        userGroup.avatar = otherMember ? otherMember?.avatar : "";
       }
 
       return res.status(200).json({ valid: true, group: userGroup });

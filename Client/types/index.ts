@@ -15,6 +15,7 @@ export interface Group {
   isGroup: boolean;
   created_at: string;
   adminId: number;
+  avatar: string;
   Message: {
     id: number;
     content: string;
@@ -37,6 +38,7 @@ export interface Message {
   groupId: string;
   name: string;
   user?: User;
+  avatar?: string;
 }
 
 export type Member = {
@@ -47,4 +49,5 @@ export type Member = {
   userGroup: Group;
   createdAt: Date;
   name: string;
+  avatar: string;
 };
