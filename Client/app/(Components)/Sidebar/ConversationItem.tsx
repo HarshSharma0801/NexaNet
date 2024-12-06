@@ -8,6 +8,7 @@ interface ConversationProp {
   msg: string;
   timestamp: Date;
   isGroup: boolean;
+  avatar: string;
 }
 
 const ConversationsItem: FunctionComponent<ConversationProp> = (
@@ -25,7 +26,11 @@ const ConversationsItem: FunctionComponent<ConversationProp> = (
       <div className="flex gap-2 justify-center">
         <div className="flex justify-center items-center">
           <div className="w-10 h-10 bg-slate-400 rounded-full flex justify-center text-center text-xl">
-            <div className="m-auto">{props.name[0]}</div>
+            {props.avatar ? (
+              <img src={props.avatar} className="object-cover w-full h-full rounded-full" />
+            ) : (
+              <div className="m-auto">{props.name[0]}</div>
+            )}
           </div>
         </div>
         <div className="flex flex-col gap-1">

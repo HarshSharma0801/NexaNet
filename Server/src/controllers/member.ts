@@ -35,6 +35,7 @@ class Member {
           userId,
           userGroupId: groupId,
           name: group.name || "Default Name",
+          avatar:""
         },
       });
 

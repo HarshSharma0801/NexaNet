@@ -1,7 +1,7 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
-
+import { makeAvatar } from "../util/avatar";
 const accessKey = process.env.JWT_ACCESS || "default";
 
 class AuthController {
@@ -11,11 +11,12 @@ class AuthController {
   }
   signup = async (req: express.Request, res: express.Response) => {
     const { name, email, password, username } = req.body;
+    const avatar = makeAvatar();
     const Userdata = {
       name,
       email,
       password,
-      avatar: "",
+      avatar,
       username,
       isGroup: false,
     };
