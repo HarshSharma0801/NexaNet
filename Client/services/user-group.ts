@@ -106,3 +106,46 @@ export const getUserGroupByNameService = async (
     return { valid: false, conversation: null };
   }
 };
+
+
+
+export const getUserGroupsByAdminService = async (
+  userId: string | string[]
+): Promise<{ groups: Group[] | null; valid: boolean }> => {
+  try {
+    const { data } = await axios.get(`/userGroupAdmin`, {
+      params: {
+        userId: userId,
+      },
+    });
+
+    if (data.valid) {
+      return { valid: true, groups: data.groups };
+    }
+    return { valid: false, groups: null };
+  } catch (error) {
+    console.error("Error fetching user groups:", error);
+    return { valid: false, groups: null };
+  }
+};
+
+
+export const deleteUserGroupService = async (
+  groupId: string
+): Promise<{ valid: boolean; message: string }> => {
+  try {
+    const { data } = await axios.delete(`/userGroup`, {
+      data: {
+        groupId: groupId,
+      },
+    });
+
+    if (data.valid) {
+      return { valid: true, message: "Group deleted successfully" };
+    }
+    return { valid: false, message: "Failed to delete group" };
+  } catch (error) {
+    console.error("Error deleting user group:", error);
+    return { valid: false, message: "Internal Server Error" };
+  }
+};

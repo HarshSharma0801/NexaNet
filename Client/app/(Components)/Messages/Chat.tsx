@@ -14,6 +14,7 @@ import { getSocket } from "@/providers/socket";
 import { getUserGroupByIdService } from "@/services/user-group";
 import { Group, Message } from "@/types";
 import { useAuthContext } from "@/providers/auth-provider";
+import MemberItem from "./MemberItem";
 
 interface ReceivedMessage {
   valid: boolean;
@@ -26,6 +27,9 @@ const Chat: FunctionComponent = (): ReactElement => {
   const [conversation, setConversation] = useState<Group | null>(null);
   const [message, setMessage] = useState<string>("");
   const [AllMessages, setAllMessages] = useState<Message[]>([]);
+  const [DetailOpen, setDetailOpen] = useState<boolean>(false);
+  const [mainUserId, setMainUserId] = useState<number | null>(null);
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const { user } = useAuthContext();
 
@@ -40,6 +44,8 @@ const Chat: FunctionComponent = (): ReactElement => {
       if (conversation) {
         setConversation(conversation);
         setAllMessages(conversation.Message);
+        setMainUserId(UserData.UserInfo.id);
+        setDetailOpen(false);
       }
     }
   };
@@ -64,7 +70,6 @@ const Chat: FunctionComponent = (): ReactElement => {
 
   useEffect(() => {
     socket.on("message", (data: ReceivedMessage) => {
-      console.log(data.message);
       setAllMessages((prev) => {
         return [...prev, data.message];
       });
@@ -92,7 +97,14 @@ const Chat: FunctionComponent = (): ReactElement => {
   return (
     <>
       <div className="flex flex-[1] md:flex-[0.7] flex-col py-2 md:p-4 md:pl-0 gap-2 ">
-        <div className="flex flex-[0.05] gap-2 md:mr-0 mr-[6px]  bg-primaryDark rounded-2xl p-3 md:p-3 text-[13px] md:text-[1rem]">
+        <div
+          onClick={() => {
+            if (conversation?.isGroup) {
+              setDetailOpen(true);
+            }
+          }}
+          className="flex cursor-pointer flex-[0.05] gap-2 md:mr-0 mr-[6px]   bg-primaryDark rounded-2xl p-3 md:p-3 text-[13px] md:text-[1rem]"
+        >
           <div className="w-10 h-10 bg-slate-400 rounded-full flex justify-center text-center text-xl">
             {conversation?.avatar ? (
               <img
@@ -128,7 +140,7 @@ const Chat: FunctionComponent = (): ReactElement => {
               } else {
                 return (
                   <OthersMessage
-                     avatar={message.avatar}
+                    avatar={message.avatar}
                     content={message.content}
                     key={message.id}
                     timestamp={message.timestamp}
@@ -166,6 +178,59 @@ const Chat: FunctionComponent = (): ReactElement => {
               d="M11.25 4.5l7.5 7.5-7.5 7.5m-6-15l7.5 7.5-7.5 7.5"
             />
           </svg>
+        </div>
+      </div>
+
+      <div className={`fixed z-50	 inset-0 ${DetailOpen ? "block" : "hidden"}`}>
+        <div className="fixed inset-0 bg-primaryDark opacity-50"></div>
+        <div className="fixed inset-0 flex items-center justify-center overflow-auto">
+          <div className="bg-secondary p-3 w-[90%] md:p-6 bg-light md:w-[50%] flex flex-col md:gap-4 gap-2 rounded-2xl">
+            <div
+              className="flex justify-end cursor-pointer"
+              onClick={() => {
+                setDetailOpen(false);
+              }}
+            >
+              <div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6 text-[#5D6D7E]"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </div>
+            </div>
+            <h2 className="text-2xl  font-bold text-[#5D6D7E] text-center mb-1 ">
+              Members
+            </h2>
+
+            <div className="md:py-4 py-2 flex flex-col justify-center overflow-y-auto">
+              {conversation &&
+                conversation.Member.map((member) => {
+                  return (
+                    <MemberItem
+                      key={member.id}
+                      name={member.name}
+                      avatar={member.avatar}
+                      id={member.id}
+                      memberUserId={member.userId}
+                      adminId={conversation.adminId}
+                      getConversation={getConversation}
+                      setDetailOpen={setDetailOpen}
+                      userId={mainUserId ?? 0}
+                    />
+                  );
+                })}
+            </div>
+          </div>
         </div>
       </div>
     </>

@@ -21,7 +21,25 @@ export const createMemberService = async (
     }
     return { valid: false, newMember: null, message: "code invalid" };
   } catch (error) {
-    console.error("Error fetching user group:", error);
+    console.error("Error:", error);
     return { valid: false, newMember: null, message: "code invalid" };
+  }
+};
+
+export const deleteMemberService = async (
+  id: string
+): Promise<{ valid: boolean; message: string }> => {
+  try {
+    console.log(id);
+    const { data } = await axios.post(`/deleteMember`, {
+      memberId: id,
+    });
+    if (data.valid) {
+      return { valid: true, message: data.message };
+    }
+    return { valid: false, message: "code invalid" };
+  } catch (error) {
+    console.error("Error:", error);
+    return { valid: false, message: "code invalid" };
   }
 };

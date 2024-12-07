@@ -29,7 +29,7 @@ export const JoinGroup: FunctionComponent = (): ReactElement => {
       <div className={`fixed z-50	 inset-0 ${open ? "block" : "hidden"}`}>
         <div className="fixed inset-0 bg-primaryDark opacity-50"></div>
         <div className="fixed inset-0 flex items-center justify-center overflow-auto">
-          <div className="bg-secondary p-3 w-[90%] md:p-6 bg-[#4C0033] md:w-[50%] flex flex-col md:gap-4 gap-2 rounded-2xl">
+          <div className="bg-secondary p-3 w-[90%] md:p-6 bg-light md:w-[50%] flex flex-col md:gap-4 gap-2 rounded-2xl">
             <div
               className="flex justify-end cursor-pointer"
               onClick={() => {
@@ -43,7 +43,7 @@ export const JoinGroup: FunctionComponent = (): ReactElement => {
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="w-6 h-6 text-white"
+                  className="w-6 h-6 text-[#5D6D7E]"
                 >
                   <path
                     strokeLinecap="round"
@@ -53,7 +53,7 @@ export const JoinGroup: FunctionComponent = (): ReactElement => {
                 </svg>
               </div>
             </div>
-            <h2 className="text-2xl  font-bold text-white text-center mb-1 ">
+            <h2 className=" md:text-4xl text-2xl  font-bold text-[#5D6D7E] text-center mb-1 ">
               {name}
             </h2>
             <div className="">
@@ -70,7 +70,7 @@ export const JoinGroup: FunctionComponent = (): ReactElement => {
             <div className="md:py-4 py-2 flex justify-center">
               <button
                 onClick={handleJoin}
-                className="bg-primarylight p-5 px-8 text-white font-bold rounded-xl"
+                className="bg-[#2C3E50] py-3 px-10 text-white font-bold rounded-xl"
               >
                 Join
               </button>
