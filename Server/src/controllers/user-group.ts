@@ -83,7 +83,13 @@ class UserGroup {
         take: 10,
       });
 
-      const modifiedGroups = userGroups.map((group) => {
+      const sortedGroups = userGroups.sort((a, b) => {
+        const aTimestamp = a.Message[0]?.timestamp?.getTime() || 0;
+        const bTimestamp = b.Message[0]?.timestamp?.getTime() || 0;
+        return bTimestamp - aTimestamp; // Sort by latest timestamp (descending)
+      });
+
+      const modifiedGroups = sortedGroups.map((group) => {
         if (!group.isGroup) {
           const otherMember = group.Member.find(
             (member) => member.userId !== Number(userId)
@@ -293,6 +299,61 @@ class UserGroup {
       return res.status(500).json({ message: "Internal Server Error" });
     }
   }
+
+
+  public async getUserGroupsByAdmin(req: express.Request, res: express.Response) {
+    const { userId } = req.query;
+  
+    if (!userId || typeof userId !== "string") {
+      return res.status(400).json({ message: "Invalid or missing userId" });
+    }
+  
+    try {
+      const userGroups = await prismaDbClient.userGroup.findMany({
+        where: {
+          isGroup: true,
+          adminId: Number(userId),
+        },
+      });
+  
+      if (userGroups.length === 0) {
+        return res.status(200).json({ valid: false, message: "No groups found" ,groups:null });
+      }
+  
+      return res.status(200).json({ valid: true, groups: userGroups , message: "found"  });
+    } catch (error) {
+      console.error("Error fetching user groups:", error);
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+
+  public async deleteUserGroup(req: express.Request, res: express.Response) {
+    const { groupId } = req.body;
+  
+    if (!groupId) {
+      return res.status(400).json({ message: "Invalid or missing groupId" });
+    }
+  
+    try {
+      const deletedGroup = await prismaDbClient.userGroup.delete({
+        where: {
+          id: groupId,
+        },
+      });
+  
+      return res.status(200).json({
+        valid: true,
+        message: "Group deleted successfully",
+        group: deletedGroup,
+      });
+    } catch (error) {
+      console.error("Error deleting user group:", error);
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+  
+
+  
 }
 
 export default new UserGroup();

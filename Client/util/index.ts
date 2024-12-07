@@ -1,12 +1,13 @@
-import { format, isAfter, addHours } from "date-fns";
+import { format, subHours, isBefore } from "date-fns";
 
 export const timeConvert = (timestamp: string | Date): string => {
   const now = new Date();
-  const twentyFourHoursFromNow = addHours(now, 24);
+  const twentyFourHoursAgo = subHours(now, 24);
 
-  const parsedTimestamp = timestamp instanceof Date ? timestamp : new Date(timestamp);
+  const parsedTimestamp =
+    timestamp instanceof Date ? timestamp : new Date(timestamp);
 
-  if (isAfter(parsedTimestamp, twentyFourHoursFromNow)) {
+  if (isBefore(parsedTimestamp, twentyFourHoursAgo)) {
     return format(parsedTimestamp, "d MMM yyyy");
   } else {
     return format(parsedTimestamp, "HH:mm");

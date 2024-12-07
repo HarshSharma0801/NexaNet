@@ -24,10 +24,7 @@ export interface Group {
     groupId: string;
     name: string;
   }[];
-  Member: {
-    userId: number;
-    name: string;
-  }[];
+  Member: Member[];
 }
 
 export interface Message {
