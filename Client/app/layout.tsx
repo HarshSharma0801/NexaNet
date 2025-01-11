@@ -4,6 +4,7 @@ import "./globals.css";
 import { UserProvider } from "@/providers/auth-provider";
 import { GroupsProvider } from "@/providers/group-provider";
 import { ModalProvider } from "@/providers/modal-provider";
+import { SocketProvider } from "@/providers/socket-provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -31,11 +32,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ModalProvider>
-          <UserProvider>
-            <GroupsProvider>{children}</GroupsProvider>
-          </UserProvider>
-        </ModalProvider>
+        <SocketProvider>
+          <ModalProvider>
+            <UserProvider>
+              <GroupsProvider>{children}</GroupsProvider>
+            </UserProvider>
+          </ModalProvider>
+        </SocketProvider>
       </body>
     </html>
   );

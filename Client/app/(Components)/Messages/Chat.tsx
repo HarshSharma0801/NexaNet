@@ -15,6 +15,7 @@ import { getUserGroupByIdService } from "@/services/user-group";
 import { Group, Message } from "@/types";
 import { useAuthContext } from "@/providers/auth-provider";
 import MemberItem from "./MemberItem";
+import { useSocketContext } from "@/providers/socket-provider";
 
 interface ReceivedMessage {
   valid: boolean;
@@ -23,7 +24,7 @@ interface ReceivedMessage {
 
 const Chat: FunctionComponent = (): ReactElement => {
   const { id } = useParams();
-
+  const { socketJoin, socket } = useSocketContext();
   const [conversation, setConversation] = useState<Group | null>(null);
   const [message, setMessage] = useState<string>("");
   const [AllMessages, setAllMessages] = useState<Message[]>([]);
@@ -43,6 +44,7 @@ const Chat: FunctionComponent = (): ReactElement => {
       );
       if (conversation) {
         setConversation(conversation);
+        socketJoin(conversation.id);
         setAllMessages(conversation.Message);
         setMainUserId(UserData.UserInfo.id);
         setDetailOpen(false);
@@ -60,22 +62,22 @@ const Chat: FunctionComponent = (): ReactElement => {
     }
   }, [AllMessages]);
 
-  const socket = useMemo(() => {
-    const socketIO = getSocket();
-    socketIO.auth = {
-      conversation: id,
-    };
-    return socketIO.connect();
-  }, [id]);
+  // const socket = useMemo(() => {
+  //   const socketIO = getSocket();
+  //   socketIO.auth = {
+  //     conversation: id,
+  //   };
+  //   return socketIO.connect();
+  // }, [id]);
 
   useEffect(() => {
-    socket.on("message", (data: ReceivedMessage) => {
+    socket?.on("message", (data: ReceivedMessage) => {
       setAllMessages((prev) => {
         return [...prev, data.message];
       });
     });
     return () => {
-      socket.close();
+      socket?.close();
     };
   }, [socket]);
 
@@ -89,7 +91,7 @@ const Chat: FunctionComponent = (): ReactElement => {
         name: user.UserInfo.username,
         groupId: id,
       };
-      socket.emit("message", data);
+      socket?.emit("send-message", data, id);
     }
     setMessage("");
   };

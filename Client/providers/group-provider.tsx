@@ -32,6 +32,7 @@ export const GroupsProvider: React.FC<{ children: React.ReactNode }> = ({
   const [groups, setGroups] = useState<Group[] | null>(null);
   const [conversation, setConversation] = useState<Group | null>(null);
   const { setOpen, setName, setId, setUserId } = useJoinModal();
+  
   const getGroups = async () => {
     const Rawdata = localStorage.getItem("UserData");
     if (Rawdata) {

@@ -13,6 +13,7 @@ import { useGroupsContext } from "@/providers/group-provider";
 import { FaUser, FaUsers } from "react-icons/fa";
 import { getUserByNameService } from "@/services/user";
 import { getUserGroupByNameService } from "@/services/user-group";
+import { useSocketContext } from "@/providers/socket-provider";
 
 interface ISearch {
   id: number;
@@ -24,6 +25,8 @@ const Sidebar: FunctionComponent = (): ReactElement => {
   const router = useRouter();
   const [open, setOpen] = useState<boolean>(false);
   const [user, setUser] = useState<any>(null);
+  const { socketConnect } = useSocketContext();
+
   useEffect(() => {
     const Rawdata = localStorage.getItem("UserData");
     if (Rawdata) {
@@ -31,6 +34,11 @@ const Sidebar: FunctionComponent = (): ReactElement => {
       setUser(UserData.UserInfo);
     }
   }, []);
+
+  useEffect(() => {
+    socketConnect();
+  }, []);
+
   const icons = [
     {
       id: 1,
