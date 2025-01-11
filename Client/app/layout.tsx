@@ -5,6 +5,7 @@ import { UserProvider } from "@/providers/auth-provider";
 import { GroupsProvider } from "@/providers/group-provider";
 import { ModalProvider } from "@/providers/modal-provider";
 import { SocketProvider } from "@/providers/socket-provider";
+import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -35,7 +36,10 @@ export default function RootLayout({
         <SocketProvider>
           <ModalProvider>
             <UserProvider>
-              <GroupsProvider>{children}</GroupsProvider>
+              <GroupsProvider>
+                <Toaster />
+                {children}
+              </GroupsProvider>
             </UserProvider>
           </ModalProvider>
         </SocketProvider>
