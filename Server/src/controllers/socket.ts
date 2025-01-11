@@ -28,29 +28,21 @@ class SocketService {
   public InitiateSocket() {
     const io = this.io;
 
-    io.use((socket: ConversationSocket, next) => {
-      const conversation = socket.handshake.auth.conversation;
-      if (!conversation) {
-        return next(new Error("conversation must be present"));
-      }
-      socket.conversation = conversation;
-      next();
-    });
-
     io.on("connect", (socket: ConversationSocket) => {
-      console.log("New Connection ", socket.id);
-      if (socket.conversation) {
-        socket.join(socket.conversation);
-        socket.on("message", async (message) => {
-          const savedMessage = await messageService.createMessage(message);
-          if (savedMessage.valid) {
-            io.to(socket.conversation ?? "").emit("message", {
-              valid: true,
-              message: savedMessage.data,
-            });
-          }
-        });
-      }
+
+      socket.on("join-room", (conversationId) => {
+        socket.join(conversationId);
+      });
+
+      socket.on("send-message", async (message, conversationId) => {
+        const savedMessage = await messageService.createMessage(message);
+        if (savedMessage.valid) {
+          io.to(conversationId ?? "").emit("message", {
+            valid: true,
+            message: savedMessage.data,
+          });
+        }
+      });
     });
   }
 }
