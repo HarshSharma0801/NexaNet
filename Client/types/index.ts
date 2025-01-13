@@ -48,3 +48,14 @@ export type Member = {
   name: string;
   avatar: string;
 };
+
+export enum CallStatus {
+  "active" = 1,
+  "incoming" = 0,
+}
+
+export type OngoingCall = {
+  conversatiionId: string;
+  status: CallStatus;
+  caller: any;
+};
