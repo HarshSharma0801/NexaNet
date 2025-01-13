@@ -10,7 +10,7 @@ import YourMessage from "./YourMessage";
 import OthersMessage from "./OthersMessage";
 import { useParams } from "next/navigation";
 import { getUserGroupByIdService } from "@/services/user-group";
-import { Group, Message } from "@/types";
+import { Group, Message, OngoingCall } from "@/types";
 import { useAuthContext } from "@/providers/auth-provider";
 import MemberItem from "./MemberItem";
 import { useSocketContext } from "@/providers/socket-provider";
@@ -18,28 +18,33 @@ import { FaVideo } from "react-icons/fa";
 import { IoCallSharp } from "react-icons/io5";
 import { MdCallEnd } from "react-icons/md";
 import DotsAnimation from "../Dots";
+import { useCallContext } from "@/providers/call-provider";
 
 interface ReceivedMessage {
   valid: boolean;
   message: Message;
 }
 
-const Chat: FunctionComponent = (): ReactElement => {
-  const { id } = useParams();
+const Chat: FunctionComponent<{ id: string; callData: OngoingCall | null }> = ({
+  id,
+  callData,
+}): ReactElement => {
   const { socketJoin, socket } = useSocketContext();
+  const { DialCall } = useCallContext();
   const [conversation, setConversation] = useState<Group | null>(null);
   const [message, setMessage] = useState<string>("");
   const [AllMessages, setAllMessages] = useState<Message[]>([]);
   const [DetailOpen, setDetailOpen] = useState<boolean>(false);
   const [mainUserId, setMainUserId] = useState<number | null>(null);
+  const [mainUser, setMainUser] = useState<any>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { user } = useAuthContext();
 
   const getConversation = async () => {
     const Rawdata = localStorage.getItem("UserData");
     if (id && Rawdata) {
       const UserData = JSON.parse(Rawdata);
+      setMainUser(UserData.UserInfo);
       const { conversation } = await getUserGroupByIdService(
         id,
         UserData.UserInfo.id
@@ -73,7 +78,7 @@ const Chat: FunctionComponent = (): ReactElement => {
     return () => {
       socket?.close();
     };
-  }, [socket]);
+  }, []);
 
   const sendMessage = () => {
     const Rawdata = localStorage.getItem("UserData");
@@ -90,42 +95,55 @@ const Chat: FunctionComponent = (): ReactElement => {
     setMessage("");
   };
 
+  const MakeCall = () => {
+    const callData: OngoingCall = {
+      conversatiionId: id,
+      status: 1,
+      caller: mainUser,
+    };
+
+    DialCall(callData);
+    
+  };
+
   return (
     <>
       <div className="flex flex-[1] md:flex-[0.7] flex-col py-2 md:p-4 md:pl-0 gap-2 relative">
-        <div className=" bg-light w-[200px]  top-24 right-6 md:w-[400px] md:h-[200px] rounded-xl absolute md:top-40 md:right-16 cursor-pointer">
-          <div className="p-2 md:p-6 flex justify-center flex-col gap-3 md:gap-6 items-center w-full">
-            <div className="flex justify-start gap-3 items-center">
-              <div className="md:w-16 w-8 md:h-16 h-8 bg-slate-400 rounded-full flex justify-start text-center text-xl">
-                {conversation?.avatar ? (
-                  <img
-                    src={conversation.avatar}
-                    className="w-full h-full object-cover rounded-full"
-                  />
-                ) : (
-                  <div className="m-auto">{conversation?.name[0]}</div>
-                )}
+        {callData && (
+          <div className=" bg-light w-[200px]  top-24 right-6 md:w-[400px] md:h-[200px] rounded-xl absolute md:top-40 md:right-16 cursor-pointer">
+            <div className="p-2 md:p-6 flex justify-center flex-col gap-3 md:gap-6 items-center w-full">
+              <div className="flex justify-start gap-3 items-center">
+                <div className="md:w-16 w-8 md:h-16 h-8 bg-slate-400 rounded-full flex justify-start text-center text-xl">
+                  {conversation?.avatar ? (
+                    <img
+                      src={conversation.avatar}
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    <div className="m-auto">{conversation?.name[0]}</div>
+                  )}
+                </div>
+                <div className="flex flex-col gap-1">
+                  <div className="text-[8px] md:text-[16px]">Incoming Call</div>
+                  <div className="text-[12px] md:text-[20px]">Ramya Singh</div>
+                </div>
               </div>
-              <div className="flex flex-col gap-1">
-                <div className="text-[8px] md:text-[16px]">Incoming Call</div>
-                <div className="text-[12px] md:text-[20px]">Ramya Singh</div>
+
+              <div>
+                <DotsAnimation />
               </div>
-            </div>
 
-            <div>
-              <DotsAnimation />
-            </div>
-
-            <div className="flex justify-center gap-3">
-              <button className="md:w-[80px]  bg-green-500 items-center flex justify-center p-2 text-white rounded-xl">
-                <IoCallSharp className="w-4 md:w-7  h-4 md:h-7" />
-              </button>
-              <button className="md:w-[80px]  bg-red-500 items-center flex justify-center p-2 text-white rounded-xl">
-                <MdCallEnd className="w-4 md:w-7  h-4 md:h-7" />
-              </button>
+              <div className="flex justify-center gap-3">
+                <button className="md:w-[80px]  bg-green-500 items-center flex justify-center p-2 text-white rounded-xl">
+                  <IoCallSharp className="w-4 md:w-7  h-4 md:h-7" />
+                </button>
+                <button className="md:w-[80px]  bg-red-500 items-center flex justify-center p-2 text-white rounded-xl">
+                  <MdCallEnd className="w-4 md:w-7  h-4 md:h-7" />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         <div className="flex  flex-[0.05] gap-2 md:mr-0 mr-[6px]   bg-primaryDark rounded-2xl p-3 md:p-3 text-[13px] md:text-[1rem]">
           <div className="flex gap-2 justify-between w-full">
@@ -156,7 +174,10 @@ const Chat: FunctionComponent = (): ReactElement => {
             </div>
 
             <div className="text-white flex justify-center items-center ">
-              <button className="flex justify-center items-center p-3 rounded-[50%]">
+              <button
+                onClick={MakeCall}
+                className="flex justify-center items-center p-3 rounded-[50%]"
+              >
                 <FaVideo className="w-8 h-6" />
               </button>
             </div>
@@ -170,7 +191,7 @@ const Chat: FunctionComponent = (): ReactElement => {
           {conversation &&
             AllMessages?.length > 0 &&
             AllMessages?.map((message) => {
-              if (user?.id === message.userId) {
+              if (mainUser?.id === message.userId) {
                 return (
                   <YourMessage
                     content={message.content}
