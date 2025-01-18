@@ -61,9 +61,6 @@ export class Call {
         await this.router.createActiveSpeakerObserver({
           interval: 300, //300 is default
         });
-      // this.activeSpeakerObserver.on("dominantspeaker", (ds: any) =>
-      //   newDominantSpeaker(ds, this, io)
-      // );
 
       resolve();
     });

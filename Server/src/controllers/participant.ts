@@ -8,7 +8,7 @@ export class Participant {
   public upstreamTransport: types.WebRtcTransport | null;
   public downstreamTransports: any;
   public producer: {
-    [key: string]: unknown;
+    [key: string]: any;
   };
   public call: any;
 
@@ -83,4 +83,3 @@ export class Participant {
     downstreamTransport[kind] = newConsumer;
   }
 }
-

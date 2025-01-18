@@ -1,7 +1,7 @@
 "use client";
 
 import { OngoingCall } from "@/types";
-import { FunctionComponent, ReactElement } from "react";
+import { FunctionComponent, ReactElement, useEffect, useRef } from "react";
 import { MdCallEnd } from "react-icons/md";
 import { FaVideoSlash } from "react-icons/fa6";
 import { FaVideo } from "react-icons/fa6";
@@ -14,6 +14,15 @@ const CallContainer: FunctionComponent<{ callData: OngoingCall }> = ({
 }): ReactElement => {
   const { HangCall } = useCallContext();
 
+  const { localstream } = useCallContext();
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (videoRef.current && localstream) {
+      videoRef.current.srcObject = localstream;
+    }
+  }, [localstream]);
+
   const EndCall = () => {
     HangCall(callData);
   };
@@ -23,6 +32,12 @@ const CallContainer: FunctionComponent<{ callData: OngoingCall }> = ({
       <div className="w-full flex flex-[1] md:flex-[0.7] flex-col py-2 md:p-4 md:pl-0 gap-2 relative">
         <div className="flex justify-center gap-2 md:mr-0 mr-[6px] h-screen text-white  bg-primarylightPurple rounded-2xl p-3 md:p-3 text-[13px] md:text-[1rem]">
           <div className="flex flex-col gap-5 justify-center w-full items-center">
+            <video
+              ref={videoRef}
+              className="rounded border w-full"
+              autoPlay
+              playsInline
+            />
             {callData.caller.username}
             <div className="flex justify-center gap-3">
               <button className="md:w-[80px]  bg-primaryDark items-center flex justify-center p-2 text-white rounded-xl">
