@@ -19,8 +19,10 @@ interface ICall {
   OngoingCall: OngoingCall | null;
   GetCall: (id: string) => OngoingCall | null;
   DialCall: (callData: OngoingCall) => void;
+  JoinCall: (callData: OngoingCall) => void;
   HangCall: (callData: OngoingCall) => void;
   localstream: MediaStream | null;
+  Participants: any;
 }
 
 const CallContext = createContext<ICall | null>(null);
@@ -32,10 +34,30 @@ export const CallProvider: React.FC<{ children: ReactNode }> = ({
   const [OngoingCall, setOngoingCall] = useState<OngoingCall | null>(null);
   const [IncomingCall, setIncomingCall] = useState<OngoingCall | null>(null);
   const [localstream, SetLocalStream] = useState<MediaStream | null>(null);
-  const [Participants, setParticipants] = useState<any>(null);
+  const [MediaDevice, setMediaDevice] = useState<Device | null>(null);
+  const [Participants, setParticipants] = useState<any>([]);
+
+  const AddParticipant = (participant: any) => {
+    console.log("in the add User Function");
+    setParticipants((prev: any) => {
+      console.log(prev, "prev");
+      return [participant, ...prev];
+    });
+  };
+
+  const GetCall = (id: string) => {
+    if (OngoingCall !== null) {
+      return OngoingCall?.conversatiionId === id ? OngoingCall : null;
+    }
+    if (IncomingCall !== null) {
+      return IncomingCall?.conversatiionId === id ? IncomingCall : null;
+    }
+    return null;
+  };
 
   useEffect(() => {
     socket?.on("incoming-call", (callData: OngoingCall) => {
+      console.log(callData, "notify-call");
       if (OngoingCall === null) {
         setIncomingCall(callData);
       }
@@ -44,20 +66,29 @@ export const CallProvider: React.FC<{ children: ReactNode }> = ({
     return () => {
       socket?.off("incoming-call");
     };
-  }, []);
+  }, [socket]);
 
-  const AddParticipant = (participant: any) => {
-    console.log("in the add User Function");
-    setParticipants((prev: any) => {
-      return [participant, ...prev];
+  useEffect(() => {
+    socket?.on("newProducersToConsume", (consumeData) => {
+      console.log("newProducersToConsume....!!");
+      console.log(MediaDevice, "device in this file");
+      if (MediaDevice) {
+        requestTransportToConsume(
+          consumeData,
+          socket,
+          MediaDevice,
+          AddParticipant
+        );
+      }
     });
-  };
 
-  const GetCall = (id: string) => {
-    return OngoingCall?.conversatiionId === id ? OngoingCall : null;
-  };
+    return () => {
+      socket?.off("newProducersToConsume");
+    };
+  }, [socket, MediaDevice]);
 
   const DialCall = async (callData: OngoingCall) => {
+    console.log(socket?.connected);
     if (socket?.connected) {
       try {
         const res = await socket.emitWithAck("join-call", callData);
@@ -66,12 +97,41 @@ export const CallProvider: React.FC<{ children: ReactNode }> = ({
         await device.load({
           routerRtpCapabilities: res.routerRtpCapabilities,
         });
+        setMediaDevice(device);
         requestTransportToConsume(res, socket, device, AddParticipant);
         const stream = await GetUserFeed();
 
         if (stream) {
-          SendFeed(device, stream);
-          
+          SendFeed(device, stream, callData);
+          socket?.emit("notify-call", {
+            ...callData,
+            status: 0,
+          });
+        }
+      } catch (err) {
+        console.error("err:", err);
+      }
+    } else {
+      console.error("Socket is not connected.");
+    }
+  };
+
+  const JoinCall = async (callData: OngoingCall) => {
+    console.log(socket?.connected);
+    if (socket?.connected) {
+      try {
+        const res = await socket.emitWithAck("join-call", callData);
+        console.log("Response from server:", res);
+        const device = new Device();
+        await device.load({
+          routerRtpCapabilities: res.routerRtpCapabilities,
+        });
+        console.log(device);
+        requestTransportToConsume(res, socket, device, AddParticipant);
+        const stream = await GetUserFeed();
+
+        if (stream) {
+          SendFeed(device, stream, callData);
         }
       } catch (err) {
         console.error("err:", err);
@@ -99,14 +159,14 @@ export const CallProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  const SendFeed = async (device: any, stream: MediaStream) => {
+  const SendFeed = async (device: any, stream: MediaStream, callData: any) => {
     const producerTransport = await createProducerTransport(socket, device);
 
     console.log(producerTransport);
-    // create Producers
+
     const producers = await createProducer(stream, producerTransport);
     console.log(producers, "Producers");
-    // setOngoingCall(callData);
+    setOngoingCall(callData);
   };
   const HangCall = (callData: OngoingCall) => {
     setOngoingCall(null);
@@ -121,8 +181,10 @@ export const CallProvider: React.FC<{ children: ReactNode }> = ({
         GetCall,
         IncomingCall,
         DialCall,
+        JoinCall,
         HangCall,
         localstream,
+        Participants,
       }}
     >
       {children}
