@@ -1,5 +1,6 @@
 const createConsumerTransport = (transportParams, device, socket, audioPid) => {
   // make a downstream transport for ONE producer/peer/client (with audio and video producers)
+  console.log(device , "device from consumer to add")
   const consumerTransport = device.createRecvTransport(transportParams);
 
   consumerTransport.on("connectionstatechange", (state) => {

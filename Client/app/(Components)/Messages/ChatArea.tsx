@@ -11,17 +11,30 @@ const ChatArea: FunctionComponent = (): ReactElement => {
   const { GetCall, OngoingCall, IncomingCall } = useCallContext();
   const [callData, setCallData] = useState<OngoingCall | null>(null);
 
-  const ValidateCall = () => {
-    if (id) {
-      setCallData(GetCall(id as string));
-    }
-  };
+  // const ValidateCall = () => {
+  //   console.log("validating call");
+  //   console.log(GetCall(id as string));
+  //   if (id) {
+  //     setCallData(GetCall(id as string));
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   const timeout = setTimeout(() => {
+  //     ValidateCall();
+  //   }, 100);
+
+  //   return () => clearTimeout(timeout);
+  // }, [OngoingCall, IncomingCall]);
 
   useEffect(() => {
-    ValidateCall();
-  }, [OngoingCall, IncomingCall]);
+    if (id) {
+      const call = GetCall(id as string);
+      setCallData(call);
+    }
+  }, [id, OngoingCall, IncomingCall]);
 
-
+  console.log(callData);
   return (
     <>
       {callData === null && <Chat id={id as string} callData={null} />}

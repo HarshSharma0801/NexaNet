@@ -10,6 +10,7 @@ const requestTransportToConsume = (consumeData, socket, device, addUser) => {
       { type: "consumer", audioPid }
     );
     console.log(consumerTransportParams, "got consumerTransportParams ok !!");
+    console.log(device , "devince in requestTransportConsume")
     const consumerTransport = createConsumerTransport(
       consumerTransportParams,
       device,
@@ -30,6 +31,7 @@ const requestTransportToConsume = (consumeData, socket, device, addUser) => {
     ]);
 
     console.log("Hope this works...");
+    console.log(combinedStream , "combinedstream")
     addUser({
       combinedStream,
       userName: consumeData.AllUserData[i],

@@ -84,7 +84,7 @@ class SocketService {
 
             const VideoProducerIds = AudioProducerIds.map((aid: any) => {
               if (this.participant instanceof Participant) {
-                const producingParticipant = this.participant.call.clients.find(
+                const producingParticipant = this.participant.call.participants.find(
                   (c: any) => c?.producer?.audio?.id === aid
                 );
                 return producingParticipant?.producer?.video?.id;
@@ -116,6 +116,18 @@ class SocketService {
         } catch (error) {
           console.error("Error in join-call:", error);
           callback({ error: error });
+        }
+      });
+
+      socket.on("notify-call", async (callData) => {
+        console.log("notify call");
+        console.log(callData)
+        try {
+          if (callData.conversatiionId) {
+            io.to(callData.conversatiionId).emit("incoming-call", callData);
+          }
+        } catch (error) {
+          console.error("Error in notify-call:", error);
         }
       });
 

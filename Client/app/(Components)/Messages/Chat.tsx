@@ -8,10 +8,8 @@ import {
 } from "react";
 import YourMessage from "./YourMessage";
 import OthersMessage from "./OthersMessage";
-import { useParams } from "next/navigation";
 import { getUserGroupByIdService } from "@/services/user-group";
 import { Group, Message, OngoingCall } from "@/types";
-import { useAuthContext } from "@/providers/auth-provider";
 import MemberItem from "./MemberItem";
 import { useSocketContext } from "@/providers/socket-provider";
 import { FaVideo } from "react-icons/fa";
@@ -30,7 +28,7 @@ const Chat: FunctionComponent<{ id: string; callData: OngoingCall | null }> = ({
   callData,
 }): ReactElement => {
   const { socketJoin, socket } = useSocketContext();
-  const { DialCall } = useCallContext();
+  const { DialCall, JoinCall } = useCallContext();
   const [conversation, setConversation] = useState<Group | null>(null);
   const [message, setMessage] = useState<string>("");
   const [AllMessages, setAllMessages] = useState<Message[]>([]);
@@ -69,16 +67,16 @@ const Chat: FunctionComponent<{ id: string; callData: OngoingCall | null }> = ({
     }
   }, [AllMessages]);
 
-  useEffect(() => {
-    socket?.on("message", (data: ReceivedMessage) => {
-      setAllMessages((prev) => {
-        return [...prev, data.message];
-      });
-    });
-    return () => {
-      socket?.close();
-    };
-  }, []);
+  // useEffect(() => {
+  //   socket?.on("message", (data: ReceivedMessage) => {
+  //     setAllMessages((prev) => {
+  //       return [...prev, data.message];
+  //     });
+  //   });
+  //   return () => {
+  //     socket?.close();
+  //   };
+  // }, [socket]);
 
   const sendMessage = () => {
     const Rawdata = localStorage.getItem("UserData");
@@ -103,7 +101,16 @@ const Chat: FunctionComponent<{ id: string; callData: OngoingCall | null }> = ({
     };
 
     DialCall(callData);
-    
+  };
+
+  const JoinVCall = () => {
+    const callData: OngoingCall = {
+      conversatiionId: id,
+      status: 1,
+      caller: mainUser,
+    };
+
+    JoinCall(callData);
   };
 
   return (
@@ -125,7 +132,9 @@ const Chat: FunctionComponent<{ id: string; callData: OngoingCall | null }> = ({
                 </div>
                 <div className="flex flex-col gap-1">
                   <div className="text-[8px] md:text-[16px]">Incoming Call</div>
-                  <div className="text-[12px] md:text-[20px]">Ramya Singh</div>
+                  <div className="text-[12px] md:text-[20px]">
+                    {callData.caller.username}
+                  </div>
                 </div>
               </div>
 
@@ -134,7 +143,10 @@ const Chat: FunctionComponent<{ id: string; callData: OngoingCall | null }> = ({
               </div>
 
               <div className="flex justify-center gap-3">
-                <button className="md:w-[80px]  bg-green-500 items-center flex justify-center p-2 text-white rounded-xl">
+                <button
+                  onClick={JoinVCall}
+                  className="md:w-[80px]  bg-green-500 items-center flex justify-center p-2 text-white rounded-xl"
+                >
                   <IoCallSharp className="w-4 md:w-7  h-4 md:h-7" />
                 </button>
                 <button className="md:w-[80px]  bg-red-500 items-center flex justify-center p-2 text-white rounded-xl">
