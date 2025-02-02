@@ -325,6 +325,7 @@ class SocketService {
       );
 
       // unpause consumer event
+      // main
       socket.on("unpauseConsumer", async ({ pid, kind }, ackCall) => {
         if (this.participant instanceof Participant) {
           const consumerToResume = this.participant.downstreamTransports.find(
